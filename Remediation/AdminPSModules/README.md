@@ -4,7 +4,7 @@ Intune Proactive Remediation that ensures required M365 admin PowerShell modules
 are installed and up to date on the device.
 
 **Author:** Jami Susijärvi, Oy Wolflake Consulting Ab — [GitHub](https://github.com/Susijarvi)
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ---
 
@@ -14,7 +14,7 @@ are installed and up to date on the device.
 |------|---------|
 | `Detect-AdminPSModules.ps1` | Checks if modules are installed and up to date. Exit 0 = compliant, Exit 1 = non-compliant. |
 | `Remediate-AdminPSModules.ps1` | Installs missing modules and updates outdated ones. |
-| `Manage-AdminPSModules.ps1` | Run manually in a console: shows color-coded status and optionally installs/updates modules interactively. Not used by Intune. |
+| `Manage-AdminPSModules.ps1` | Run manually in a console: shows color-coded status and optionally installs/updates modules interactively. Supports CurrentUser and AllUsers scope. Not used by Intune. |
 
 ---
 
@@ -169,6 +169,7 @@ If you choose Y, the script installs/updates the non-compliant modules and re-di
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 2026-04-08 | Initial stable release |
+| 1.1.0 | 2026-04-08 | Manage: added CurrentUser/AllUsers scope selection |
 
 ---
 

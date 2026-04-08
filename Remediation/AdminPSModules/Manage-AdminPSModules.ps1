@@ -19,7 +19,7 @@
 .NOTES
     Author  : Jami Susijärvi, Oy Wolflake Consulting Ab
     GitHub  : https://github.com/Susijarvi
-    Version : 1.0.0
+    Version : 1.1.0
     Created : 2026-04-07
 
     Run as administrator to install modules in AllUsers scope.
@@ -35,6 +35,7 @@
     1.0.0 - 2026-04-08 - Initial stable release. Manages M365 admin PowerShell modules via
                           Intune Proactive Remediation — silently detects, remediates, and
                           interactively manages module installation and updates.
+    1.1.0 - 2026-04-08 - Added scope selection: choose CurrentUser or AllUsers at runtime.
 #>
 
 # =============================================================================
@@ -77,6 +78,20 @@ $modulesPS7 = @(
 
 # Force TLS 1.2 - required for PSGallery connections
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# =============================================================================
+# SCOPE SELECTION
+# CurrentUser: installs to your profile, roams with OneDrive, no admin required
+# AllUsers:    installs system-wide, requires admin
+# Note: NuGet provider always installs to AllUsers (CurrentUser not supported)
+# =============================================================================
+Write-Host ""
+Write-Host " Install scope:" -ForegroundColor White
+Write-Host "  [1] CurrentUser  - installs to your profile, roams with OneDrive, no admin required (default)"
+Write-Host "  [2] AllUsers     - installs system-wide, requires admin"
+$scopeAnswer = Read-Host " Select [1/2]"
+$installScope = if ($scopeAnswer -eq '2') { 'AllUsers' } else { 'CurrentUser' }
+Write-Host (" Using scope: {0}" -f $installScope) -ForegroundColor Cyan
 
 # =============================================================================
 # NUGET PROVIDER CHECK
@@ -262,7 +277,7 @@ try {
 
 $acceptLicenseSupported = (Get-Command Install-Module -ErrorAction SilentlyContinue).Parameters.ContainsKey('AcceptLicense')
 $installParams = @{
-    Scope        = 'AllUsers'
+    Scope        = $installScope
     Force        = $true
     AllowClobber = $true
     ErrorAction  = 'Stop'
@@ -299,13 +314,13 @@ if ($ps7Needs.Count -gt 0 -and $pwsh7) {
             if ($action -eq 'install') {
                 Write-Host " Installing (PS7): $moduleName..." -ForegroundColor Cyan -NoNewline
                 & $pwsh7 -NonInteractive -NoProfile -Command "
-                    Install-Module -Name '$moduleName' -Scope AllUsers -Force -AllowClobber -AcceptLicense -ErrorAction Stop
+                    Install-Module -Name '$moduleName' -Scope $installScope -Force -AllowClobber -AcceptLicense -ErrorAction Stop
                 " 2>&1 | Where-Object { $_ } | ForEach-Object { Write-Host "  [pwsh] $_" }
                 Write-Host " done." -ForegroundColor Green
             } else {
                 Write-Host " Updating (PS7):   $moduleName..." -ForegroundColor Cyan -NoNewline
                 & $pwsh7 -NonInteractive -NoProfile -Command "
-                    Update-Module -Name '$moduleName' -Force -ErrorAction Stop
+                    Update-Module -Name '$moduleName' -Scope $installScope -Force -ErrorAction Stop
                 " 2>&1 | Where-Object { $_ } | ForEach-Object { Write-Host "  [pwsh] $_" }
                 Write-Host " done." -ForegroundColor Green
             }
