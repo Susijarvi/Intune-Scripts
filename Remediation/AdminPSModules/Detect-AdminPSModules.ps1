@@ -15,7 +15,7 @@
 .NOTES
     Author  : Jami Susijärvi, Oy Wolflake Consulting Ab
     GitHub  : https://github.com/Susijarvi
-    Version : 1.0.0
+    Version : 1.1.0
     Created : 2026-04-05
 
 .INTUNE
@@ -52,6 +52,7 @@
     1.0.0 - 2026-04-08 - Initial stable release. Manages M365 admin PowerShell modules via
                           Intune Proactive Remediation — silently detects, remediates, and
                           interactively manages module installation and updates.
+    1.1.0 - 2026-04-08 - Version bump to stay in sync with Manage (scope selection added).
 #>
 
 # =============================================================================
